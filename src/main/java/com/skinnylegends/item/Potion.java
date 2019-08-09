@@ -1,6 +1,6 @@
-package src.item;
+package com.skinnylegends.item;
 
-import src.item.Item;
+import com.skinnylegends.item.Item;
 
 public abstract class Potion extends Item {
     public Potion(String name) {

@@ -1,6 +1,6 @@
-package src.item.potion;
+package com.skinnylegends.item.potion;
 
-import src.item.Potion;
+import com.skinnylegends.item.Potion;
 import javafx.scene.image.Image;
 
 public class HealthPotion extends Potion {
@@ -15,6 +15,6 @@ public class HealthPotion extends Potion {
 
     @Override
     public Image render() {
-        return new Image(getClass().getResource("./img/healthpotion.png").toString());
+        return new Image(getClass().getResource("./healthpotion.png").toString());
     }
 }

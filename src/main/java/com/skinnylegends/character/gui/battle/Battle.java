@@ -1,8 +1,8 @@
-package src.character.gui.battle;
+package com.skinnylegends.character.gui.battle;
 
-import src.character.Player;
-import src.character.NPC;
-import src.game.Game;
+import com.skinnylegends.character.Player;
+import com.skinnylegends.character.NPC;
+import com.skinnylegends.game.Game;
 
 import javafx.scene.Scene;
 import java.io.File;
@@ -23,7 +23,7 @@ public class Battle extends Scene {
         } catch (Exception e) {
             e.printStackTrace(); 
         }
-        BattleController battleController = loader.<BattleController>getController();
+        BattleController battleController = loader.getController();
         battleController.initialize(player, npc, game);
         this.setRoot(root);
     }

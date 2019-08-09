@@ -1,7 +1,7 @@
-package src.item.gui.droppedItem;
+package com.skinnylegends.item.gui.droppedItem;
 
-import src.game.Game;
-import src.item.*;
+import com.skinnylegends.game.Game;
+import com.skinnylegends.item.*;
 
 import java.io.File;
 import java.io.FileInputStream;

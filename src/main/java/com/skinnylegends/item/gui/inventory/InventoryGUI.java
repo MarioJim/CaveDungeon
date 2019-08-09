@@ -1,6 +1,6 @@
-package src.item.gui.inventory;
+package com.skinnylegends.item.gui.inventory;
 
-import src.game.Game;
+import com.skinnylegends.game.Game;
 
 import java.io.File;
 import java.io.FileInputStream;

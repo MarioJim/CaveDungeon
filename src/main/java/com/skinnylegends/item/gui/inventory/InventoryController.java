@@ -1,8 +1,8 @@
-package src.item.gui.inventory;
+package com.skinnylegends.item.gui.inventory;
 
-import src.character.Player;
-import src.item.Inventory;
-import src.game.Game;
+import com.skinnylegends.character.Player;
+import com.skinnylegends.item.Inventory;
+import com.skinnylegends.game.Game;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;

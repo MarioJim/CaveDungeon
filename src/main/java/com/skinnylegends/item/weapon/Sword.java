@@ -1,7 +1,7 @@
-package src.item.weapon;
+package com.skinnylegends.item.weapon;
 
-import src.item.Weapon;
-import src.item.weapon.Ability;
+import com.skinnylegends.item.Weapon;
+import com.skinnylegends.item.weapon.Ability;
 import javafx.scene.image.Image;
 
 public class Sword extends Weapon {
@@ -25,6 +25,6 @@ public class Sword extends Weapon {
 
     @Override
     public Image render() {
-        return new Image(getClass().getResource("./img/sword" + sprite + ".png").toString());
+        return new Image(getClass().getResource("./sword" + sprite + ".png").toString());
     }
 }

@@ -1,7 +1,7 @@
-package src.character.npc;
+package com.skinnylegends.character.npc;
 
-import src.character.NPC;
-import src.character.Player;
+import com.skinnylegends.character.NPC;
+import com.skinnylegends.character.Player;
 
 import javafx.scene.image.Image;
 import java.util.concurrent.ThreadLocalRandom;
@@ -13,7 +13,7 @@ public class Chest extends NPC {
 
     @Override
     public Image render() {
-        return new Image(getClass().getResource("./chest/img/chest.gif").toString());
+        return new Image(getClass().getResource("./chest/chest.gif").toString());
     }
 
     @Override
@@ -25,8 +25,7 @@ public class Chest extends NPC {
     protected int[] getArgsForWeapon(Player player) {
         int baseAttack = ThreadLocalRandom.current().nextInt(30, 36);
         int baseStamina = ThreadLocalRandom.current().nextInt(10, 14);
-        int[] res = { baseAttack, baseStamina };
-        return res;
+        return new int[]{ baseAttack, baseStamina };
     }
 
     @Override
@@ -40,7 +39,7 @@ public class Chest extends NPC {
     }
 
     @Override
-    public String getParent() {
-        return "Chest";
+    public ParentCharacter getParent() {
+        return ParentCharacter.CHEST;
     }
 }

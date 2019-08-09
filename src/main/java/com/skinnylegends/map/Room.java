@@ -1,9 +1,9 @@
-package src.map;
+package com.skinnylegends.map;
 
-import src.character.NPC;
-import src.character.Player;
-import src.character.npc.enemy.MimicChest;
-import src.map.gui.MapRender;
+import com.skinnylegends.character.NPC;
+import com.skinnylegends.character.Player;
+import com.skinnylegends.character.npc.enemy.MimicChest;
+import com.skinnylegends.map.gui.MapRender;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,27 +16,22 @@ import javafx.geometry.VPos;
 import javafx.scene.image.ImageView;
 
 public class Room implements Serializable {
-    private static final long serialVersionUID = 1L;
     // 0 to be defined, 1 initial, 2 easy, 3 hard, 4 treasure, 5 boss
     private int state;
     // 0 top, 1 right, 2 bottom, 3 left
-    private boolean doors[];
+    private boolean[] doors;
     private boolean areDoorsOpen;
-    private Tile tiles[][];
+    private Tile[][] tiles;
     private int[] playerPos;
     public static final int sizeX = 7, sizeY = 11;
     public static final int centerX = (int) Math.floor((sizeX - 1) / 2.0);
     public static final int centerY = (int) Math.floor((sizeY - 1) / 2.0);
 
-    protected Room(int state, boolean[] doors) {
+    Room(int state, boolean[] doors) {
         this.state = state;
         this.doors = doors;
         this.areDoorsOpen = false;
         tiles = new Tile[sizeX][sizeY];
-    }
-
-    public Room() {
-
     }
 
     void setState(int state) {
@@ -47,8 +42,8 @@ public class Room implements Serializable {
         return state;
     }
 
-    void setDoor(int place, boolean door) {
-        doors[place] = door;
+    void closeDoor(int place) {
+        doors[place] = false;
     }
 
     boolean getDoor(int place) {
@@ -60,13 +55,14 @@ public class Room implements Serializable {
     }
 
     public void checkIfDoorsShouldOpen() {
-        // Commented for testing purposes
-        // for (int x = 0; x < sizeX; x++)
-        // for (int y = 0; y < sizeY; y++)
-        // if (tiles[x][y].hasCharacter() == 'b' || tiles[x][y].hasCharacter() == 'e') {
-        // this.areDoorsOpen = false;
-        // return;
-        // }
+        // TODO: Uncomment, commented for testing purposes
+        // TODO: Fix where the function is called
+//        for (int x = 0; x < sizeX; x++)
+//            for (int y = 0; y < sizeY; y++)
+//                if (tiles[x][y].hasCharacter() == 'b' || tiles[x][y].hasCharacter() == 'e') {
+//                    this.areDoorsOpen = false;
+//                    return;
+//                }
         this.areDoorsOpen = true;
     }
 
@@ -114,7 +110,7 @@ public class Room implements Serializable {
         playerPos = new int[] { x, y };
     }
 
-    protected void setPlayer(Player player) {
+    void setPlayer(Player player) {
         try {
             setPlayer(player, centerX, centerY);
         } catch (TileAlreadyOccupiedException e) {
@@ -126,75 +122,72 @@ public class Room implements Serializable {
         tiles[playerPos[0]][playerPos[1]].clearCharacter();
     }
 
-    public boolean movePlayer(int x, int y, MapRender mR) {
+    public void movePlayer(int x, int y, MapRender mapRender) {
         Player p = (Player) tiles[playerPos[0]][playerPos[1]].getCharacter();
         try {
             int[] lastPlayerPos = playerPos;
             setPlayer(p, playerPos[0] + x, playerPos[1] + y);
             tiles[lastPlayerPos[0]][lastPlayerPos[1]].clearCharacter();
-            return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            // To check if Player should move to another room
-            if (areDoorsOpen) {
-                if (playerPos[0] == centerX) {
-                    if (playerPos[1] == 0 && doors[3]) {
-                        tiles[playerPos[0]][playerPos[1]].clearCharacter();
-                        mR.moveToRoom("LEFT", p);
-                    } else if (playerPos[1] == sizeY - 1 && doors[1]) {
-                        tiles[playerPos[0]][playerPos[1]].clearCharacter();
-                        mR.moveToRoom("RIGHT", p);
-                    }
-                } else if (playerPos[1] == centerY) {
-                    if (playerPos[0] == 0 && doors[0]) {
-                        tiles[playerPos[0]][playerPos[1]].clearCharacter();
-                        mR.moveToRoom("UP", p);
-                    } else if (playerPos[0] == sizeX - 1 && doors[2]) {
-                        tiles[playerPos[0]][playerPos[1]].clearCharacter();
-                        mR.moveToRoom("DOWN", p);
-                    }
+            // If doors are closed, do nothing
+            if (!areDoorsOpen) return;
+            // Check if Player can move to another room
+            if (playerPos[0] == centerX) {
+                if (playerPos[1] == 0 && doors[3]) {
+                    tiles[playerPos[0]][playerPos[1]].clearCharacter();
+                    mapRender.moveToRoom(MapRender.Direction.LEFT, p);
+                } else if (playerPos[1] == sizeY - 1 && doors[1]) {
+                    tiles[playerPos[0]][playerPos[1]].clearCharacter();
+                    mapRender.moveToRoom(MapRender.Direction.RIGHT, p);
+                }
+            } else if (playerPos[1] == centerY) {
+                if (playerPos[0] == 0 && doors[0]) {
+                    tiles[playerPos[0]][playerPos[1]].clearCharacter();
+                    mapRender.moveToRoom(MapRender.Direction.UP, p);
+                } else if (playerPos[0] == sizeX - 1 && doors[2]) {
+                    tiles[playerPos[0]][playerPos[1]].clearCharacter();
+                    mapRender.moveToRoom(MapRender.Direction.DOWN, p);
                 }
             }
-            return false;
         } catch (TileAlreadyOccupiedException e) {
             NPC npc = (NPC) tiles[playerPos[0] + x][playerPos[1] + y].getCharacter();
             if (npc.getType().equals("Chest")) {
                 if (Math.random() < 0.25)
-                    mR.getGame().startBattle(new MimicChest());
+                    mapRender.getGame().startBattle(new MimicChest());
                 else if (Math.random() > 0.5)
-                    mR.getGame().itemDropped(npc.dropWeapon(p));
+                    mapRender.getGame().itemDropped(npc.dropWeapon(p));
                 else
-                    mR.getGame().itemDropped(npc.dropArmor(p));
+                    mapRender.getGame().itemDropped(npc.dropArmor(p));
             } else {
-                mR.getGame().startBattle(npc);
+                mapRender.getGame().startBattle(npc);
             }
             tiles[playerPos[0] + x][playerPos[1] + y].clearCharacter();
-            return false;
         }
     }
     
     String roomToString() {
-        String res = "";
+        StringBuilder res = new StringBuilder();
         for (int y = -1; y < sizeY + 1; y++)
-            res += (doors[0] && y == centerY) ? "d" : "-";
-        res += "\n";
+            res.append((doors[0] && y == centerY) ? "d" : "-");
+        res.append("\n");
         for (int x = 0; x < sizeX; x++) {
-            res += (doors[3] && x == centerX) ? "d" : "|";
+            res.append((doors[3] && x == centerX) ? "d" : "|");
             for (int y = 0; y < sizeY; y++)
-                res += tiles[x][y].hasCharacter();
-            res += (doors[1] && x == centerX) ? "d" : "|";
-            res += "\n";
+                res.append(tiles[x][y].hasCharacter());
+            res.append((doors[1] && x == centerX) ? "d" : "|");
+            res.append("\n");
         }
         for (int y = -1; y < sizeY + 1; y++)
-            res += (doors[2] && y == centerY) ? "d" : "-";
-        res += "\n";
-        return res;
+            res.append((doors[2] && y == centerY) ? "d" : "-");
+        res.append("\n");
+        return res.toString();
     }
 
     public ImageView[] renderWalls() {
         ImageView[] walls = new ImageView[4];
         for (int i = 0; i < walls.length; i++) {
             String doorState = doors[i] ? (areDoorsOpen ? "op" : "cl") : "no";
-            String p1 = "./img/wall/" + i + "_" + doorState + ".png";
+            String p1 = "./wall/" + i + "_" + doorState + ".png";
             walls[i] = new ImageView(getClass().getResource(p1).toString());
         }
         return walls;
@@ -217,7 +210,7 @@ public class Room implements Serializable {
                 if (tiles[i][j].getCharacter() != null)
                     ivChar = new ImageView(tiles[i][j].getCharacter().render());
                 else
-                    ivChar = new ImageView(getClass().getResource("./img/emptyTile.png").toString());
+                    ivChar = new ImageView(getClass().getResource("./emptyTile.png").toString());
 
                 ivChar.setSmooth(false);
                 if (tiles[i][j].hasCharacter() == 'b')
@@ -232,7 +225,6 @@ public class Room implements Serializable {
                 GridPane.setValignment(ivChar, VPos.BOTTOM);
             }
         }
-        StackPane stack = new StackPane(floor, characters);
-        return stack;
+        return new StackPane(floor, characters);
     }
 }

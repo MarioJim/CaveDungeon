@@ -1,6 +1,6 @@
-package src.item.armor;
+package com.skinnylegends.item.armor;
 
-import src.item.Armor;
+import com.skinnylegends.item.Armor;
 import javafx.scene.image.Image;
 
 public class Ring extends Armor {
@@ -16,6 +16,6 @@ public class Ring extends Armor {
 
     @Override
     public Image render() {
-        return new Image(getClass().getResource("./img/ring" + sprite + ".png").toString());
+        return new Image(getClass().getResource("./ring" + sprite + ".png").toString());
     }
 }

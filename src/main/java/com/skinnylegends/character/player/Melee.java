@@ -1,10 +1,10 @@
-package src.character.player;
+package com.skinnylegends.character.player;
 
-import src.character.Player;
-import src.item.Inventory;
-import src.item.armor.*;
-import src.item.weapon.*;
-import src.item.potion.*;
+import com.skinnylegends.character.Player;
+import com.skinnylegends.item.Inventory;
+import com.skinnylegends.item.armor.*;
+import com.skinnylegends.item.weapon.*;
+import com.skinnylegends.item.potion.*;
 
 import javafx.scene.image.Image;
 
@@ -28,7 +28,7 @@ public class Melee extends Player {
 
     @Override
     public Image render() {
-        String path = "./img/melee_" + getGender() + ".gif";
+        String path = "./melee_" + getGender() + ".gif";
         return new Image(getClass().getResource(path).toString());
     }
 }

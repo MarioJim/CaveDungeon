@@ -1,17 +1,17 @@
-package src.game;
+package com.skinnylegends.game;
 
-import src.character.gui.battle.Battle;
-import src.character.gui.createplayer.CreatePlayer;
-import src.character.NPC;
-import src.character.Player;
-import src.item.Armor;
-import src.item.Potion;
-import src.item.Weapon;
-import src.item.gui.droppedItem.DroppedItemGUI;
-import src.item.gui.inventory.InventoryGUI;
-import src.map.gui.MapRender;
-import src.map.Map;
-import src.game.gui.Start;
+import com.skinnylegends.character.gui.battle.Battle;
+import com.skinnylegends.character.gui.createplayer.CreatePlayer;
+import com.skinnylegends.character.NPC;
+import com.skinnylegends.character.Player;
+import com.skinnylegends.item.Armor;
+import com.skinnylegends.item.Potion;
+import com.skinnylegends.item.Weapon;
+import com.skinnylegends.item.gui.droppedItem.DroppedItemGUI;
+import com.skinnylegends.item.gui.inventory.InventoryGUI;
+import com.skinnylegends.map.gui.MapRender;
+import com.skinnylegends.map.Map;
+import com.skinnylegends.game.gui.Start;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +19,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
 import javafx.stage.Stage;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -43,9 +42,8 @@ public class Game extends Application {
         stage.setOnCloseRequest(event -> {
             try {
                 if(findFile(player.getName(), 'P').delete() && findFile(player.getName(), 'M').delete()) {
-                    System.out.println("Game saved successfully"); 
-                    savePlayer();
-                    saveMap();
+                    System.out.println("Game saved successfully");
+                    savePlayerAndMap();
                 }
             } catch (IOException e) {
                 System.out.println("File not found");
@@ -58,8 +56,8 @@ public class Game extends Application {
     }
 
     private void mapTests() {
-        for (int i = 0; i < levels.length; ++i)
-            System.out.println(levels[i].mapToString());
+        for (Map level : levels)
+            System.out.println(level.mapToString());
     }
 
     private void playerTests() {
@@ -72,23 +70,20 @@ public class Game extends Application {
     }
 
     //This method runs only when a new user is created
-    public void setNewPlayerAndContinue(Player player) throws IOException, ClassNotFoundException {
+    public void setPlayer(Player player) {
         this.player = player;
         player.getInventory().equipWeapon(0);
-        String classpath = System.getProperty("java.class.path");
-        new File(classpath + "/src/game/saves/" + player.getName()).mkdir();
-        savePlayer();
-        saveMap();
+        try {
+            savePlayerAndMap();
+        } catch (IOException e) {
+            System.out.println("Game not saved | Player not loaded or created");
+        }
+        // TODO: Change experience at the start
         player.checkLevelUp(400);
-        levels[0].setPlayer(player);
-        mapTests();
-        mapRender = new MapRender(this, levels[0]);
-        playerTests();
-        setRoomScene();
     }
 
     //This method runs only when an user is loaded
-    public void setNewPlayerAndContinue() throws IOException, ClassNotFoundException {
+    public void addPlayerToMapAndContinue() {
         levels[0].setPlayer(player);
         mapTests();
         mapRender = new MapRender(this, levels[0]);
@@ -128,49 +123,50 @@ public class Game extends Application {
         stage.setScene(new DroppedItemGUI(this, newArmor));
     }
     
-    public void savePlayer() throws IOException {
-        FileOutputStream fileOut = new FileOutputStream(findFile(player.getName(), 'P'));
-        ObjectOutputStream savePlayer = new ObjectOutputStream(fileOut);
+    private void savePlayerAndMap() throws IOException {
+        FileOutputStream playerFile = new FileOutputStream(findFile(player.getName(), 'P'));
+        ObjectOutputStream savePlayer = new ObjectOutputStream(playerFile);
         savePlayer.writeObject(player);
         savePlayer.close();
-    }
-
-    public void loadPlayer(String name) throws IOException, ClassNotFoundException {
-        FileInputStream fileIn = new FileInputStream(findFile(name, 'P'));
-        ObjectInputStream in = new ObjectInputStream(fileIn);
-        player = (Player) in.readObject();
-        System.out.println("Player loaded: " + player.getName());
-        in.close();
-        fileIn.close();
-    }
-
-    public void saveMap() throws IOException {
         try {
-            int x = ((MapRender) mapRender).getXPos();
-            int y = ((MapRender) mapRender).getYPos();
-            levels[0].getRoom(x, y).removePlayer();
+            int[] pos = ((MapRender) mapRender).getPos();
+            levels[0].getRoom(pos[0], pos[1]).removePlayer();
+        } catch (NullPointerException e) {
+            System.out.println("No player to remove from map");
         }
-        catch(NullPointerException exception) {
-            System.out.println("Map created and saved");
-        }
-        FileOutputStream fileOut = new FileOutputStream(findFile(player.getName(), 'M'));
-        ObjectOutputStream saveMap = new ObjectOutputStream(fileOut);
+        FileOutputStream mapFile = new FileOutputStream(findFile(player.getName(), 'M'));
+        ObjectOutputStream saveMap = new ObjectOutputStream(mapFile);
         saveMap.writeObject(levels);
         saveMap.close();
     }
 
-    public void loadMap(String name) throws IOException, ClassNotFoundException {
-        FileInputStream fileIn = new FileInputStream(findFile(name, 'M'));
-        ObjectInputStream in = new ObjectInputStream(fileIn);
-        levels = (Map[]) in.readObject();
+    public void loadPlayerAndMap(String name) throws IOException, ClassNotFoundException {
+        FileInputStream playerFileIn = new FileInputStream(findFile(name, 'P'));
+        ObjectInputStream playerObjectIn = new ObjectInputStream(playerFileIn);
+        player = (Player) playerObjectIn.readObject();
+        System.out.println("Player loaded: " + player.getName());
+        playerObjectIn.close();
+        playerFileIn.close();
+        FileInputStream mapFileIn = new FileInputStream(findFile(name, 'M'));
+        ObjectInputStream mapObjectIn = new ObjectInputStream(mapFileIn);
+        levels = (Map[]) mapObjectIn.readObject();
         System.out.println("Map loaded");
-        in.close();
-        fileIn.close();
+        mapObjectIn.close();
+        mapFileIn.close();
     }
 
-    public File findFile(String name, char type) throws IOException {
+    public File findFile(String name, char type) {
         String classpath = System.getProperty("java.class.path");
-        return (type == 'P') ? new File(classpath + "/src/game/saves/" + name + "/", "player.atm") : 
-                new File(classpath + "/src/game/saves/" + name + "/", "map.atm");
+        String userSavesPath = classpath + File.separatorChar + "saves" + File.separatorChar + name + File.separatorChar;
+        File userSavesDir = new File(userSavesPath);
+        userSavesDir.mkdirs();
+        switch (type) {
+            case 'P':
+                return new File(userSavesDir, "player.atm");
+            case 'M':
+                return new File(userSavesDir, "map.atm");
+            default:
+                return userSavesDir;
+        }
     }
 }

@@ -1,15 +1,11 @@
-package src.character.gui.createplayer;
+package com.skinnylegends.character.gui.createplayer;
 
-import src.character.Player;
-import src.character.player.*;
-import src.game.Game;
-
-import java.io.File;
-import java.io.IOException;
+import com.skinnylegends.character.Player;
+import com.skinnylegends.character.player.*;
+import com.skinnylegends.game.Game;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
-import javafx.event.ActionEvent;
 import javafx.scene.control.ChoiceBox;
 
 public class CreatePlayerController {
@@ -22,21 +18,17 @@ public class CreatePlayerController {
     @FXML
     private ChoiceBox<String> gender;
 
-    public CreatePlayerController() {
-    }
-
     @FXML
-    private void selectMelee(ActionEvent event) {
+    private void selectMelee() {
         playerSelected = 1;
     }
-
     @FXML
-    private void selectMage(ActionEvent event) {
+    private void selectMage() {
         playerSelected = 2;
     }
 
     @FXML
-    private void createPlayer(ActionEvent event) throws ClassNotFoundException, IOException {
+    private void createPlayer() {
         if (name.getText().equals("")) {
             System.out.println("Enter a name");
             return;
@@ -51,17 +43,16 @@ public class CreatePlayerController {
     }
 
     private char genderSelected() {
-        return (((String) gender.getValue()).equals("Male")) ? 'm' : 'f';
+        return gender.getValue().equals("Male") ? 'm' : 'f';
     }
 
     public void setGame(Game game) {
         this.game = game;
     }
 
-    public void checkAccount() throws IOException, ClassNotFoundException {
-        if(findFile(name.getText(), 'P').exists()) {
+    private void checkAccount() {
+        if (game.findFile(name.getText(), 'P').exists())
             System.out.println("User already exists");
-        }
         else {
             switch (playerSelected) {
                 case 1:
@@ -72,13 +63,8 @@ public class CreatePlayerController {
                     break;
                 }
             // Set the newPlayer to game
-            game.setNewPlayerAndContinue(newPlayer);
+            game.setPlayer(newPlayer);
+            game.addPlayerToMapAndContinue();
         }
-    }
-
-    public File findFile(String name, char type) throws IOException {
-        String classpath = System.getProperty("java.class.path");
-        return (type == 'P') ? new File(classpath + "/src/game/saves/" + name + "/", "player.atm") : 
-                new File(classpath + "/src/game/saves/" + name + "/", "map.atm");
     }
 }

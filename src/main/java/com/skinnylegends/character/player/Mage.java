@@ -1,16 +1,14 @@
-package src.character.player;
+package com.skinnylegends.character.player;
 
-import src.character.Player;
-import src.item.Inventory;
-import src.item.armor.*;
-import src.item.weapon.*;
-import src.item.potion.*;
+import com.skinnylegends.character.Player;
+import com.skinnylegends.item.Inventory;
+import com.skinnylegends.item.armor.*;
+import com.skinnylegends.item.weapon.*;
+import com.skinnylegends.item.potion.*;
 
 import javafx.scene.image.Image;
 
 public class Mage extends Player {
-    private static final long serialVersionUID = 1L;
-
     public Mage(String name, char gender) {
         super(name, 20, gender, new Inventory(), 1.0, 1.2);
         this.inventory.addItemToInventory(new EnchantedBook(15, 5), 0);
@@ -21,9 +19,6 @@ public class Mage extends Player {
         this.inventory.addItemToInventory(new StaminaPotion(), 2);
     }
 
-    public Mage() {
-    }
-
     @Override
     public String getType() {
         return "Mage";
@@ -31,7 +26,7 @@ public class Mage extends Player {
 
     @Override
     public Image render() {
-        String path = "./img/mage_" + getGender() + ".gif";
+        String path = "./mage_" + getGender() + ".gif";
         return new Image(getClass().getResource(path).toString());
     }
 }

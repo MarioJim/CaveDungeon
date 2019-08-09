@@ -1,6 +1,6 @@
-package src.character.npc;
+package com.skinnylegends.character.npc;
 
-import src.character.NPC;
+import com.skinnylegends.character.NPC;
 
 public abstract class Enemy extends NPC {
     public Enemy(String name, int healthPoints, int baseDamage, int baseDefense) {
@@ -8,8 +8,8 @@ public abstract class Enemy extends NPC {
     }
 
     @Override
-    public String getParent() {
-        return "Enemy";
+    public ParentCharacter getParent() {
+        return ParentCharacter.ENEMY;
     }
 
     public abstract int getExperience();

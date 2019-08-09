@@ -1,10 +1,10 @@
-package src.character.gui.battle;
+package com.skinnylegends.character.gui.battle;
 
-import src.character.Player;
-import src.character.npc.Boss;
-import src.character.NPC;
-import src.game.Game;
-import src.item.Inventory;
+import com.skinnylegends.character.Player;
+import com.skinnylegends.character.npc.Boss;
+import com.skinnylegends.character.NPC;
+import com.skinnylegends.game.Game;
+import com.skinnylegends.item.Inventory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,7 +15,6 @@ import java.net.URISyntaxException;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
 import javafx.fxml.FXML;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.image.ImageView;
@@ -63,21 +62,20 @@ public class BattleController {
             loader[i].setController(this);
         }
         try {
-            selectAttack = (Pane) loader[0].load(loadFXML("./selectAttack.fxml"));
-            selectPotion = (Pane) loader[1].load(loadFXML("./selectPotion.fxml"));
-            playerAttack = (Pane) loader[2].load(loadFXML("./playerAttack.fxml"));
-            enemyAttack = (Pane) loader[3].load(loadFXML("./enemyAttack.fxml"));
-            battleResult = (Pane) loader[4].load(loadFXML("./battleResult.fxml"));
-            equipPWeapon = (Pane) loader[5].load(loadFXML("./equipWeapon.fxml"));
+            selectAttack = loader[0].load(loadFXML("./selectAttack.fxml"));
+            selectPotion = loader[1].load(loadFXML("./selectPotion.fxml"));
+            playerAttack = loader[2].load(loadFXML("./playerAttack.fxml"));
+            enemyAttack = loader[3].load(loadFXML("./enemyAttack.fxml"));
+            battleResult = loader[4].load(loadFXML("./battleResult.fxml"));
+            equipPWeapon = loader[5].load(loadFXML("./equipWeapon.fxml"));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public FileInputStream loadFXML(String path) throws URISyntaxException, FileNotFoundException {
+    private FileInputStream loadFXML(String path) throws URISyntaxException, FileNotFoundException {
         URI fxmlDocPath = getClass().getResource(path).toURI();
-        FileInputStream fxmlStream = new FileInputStream(new File(fxmlDocPath));
-        return fxmlStream;
+        return new FileInputStream(new File(fxmlDocPath));
     }
 
     @FXML
@@ -94,84 +92,83 @@ public class BattleController {
     }
 
     @FXML
-    private void attack(ActionEvent event) {
+    private void attack() {
         changePane(selectOption, selectAttack);
     }
 
     @FXML
-    private void usePotion(ActionEvent event) {
-        if (checkPotions() == true)
+    private void usePotion() {
+        if (checkPotions())
             changePane(selectOption, selectPotion);
     }
 
     @FXML
-    private void useBasicAttack(ActionEvent event) {
+    private void useBasicAttack() {
         attackSystem();
     }
 
     @FXML
-    private void useAbilityOne(ActionEvent event) {
+    private void useAbilityOne() {
         attackSystem(0);
     }
 
     @FXML
-    private void equipWeapon(ActionEvent event) {
+    private void equipWeapon() {
         changePane(selectOption, equipPWeapon);
     }
 
     @FXML
-    private void switchWeapon(ActionEvent event) {
+    private void switchWeapon() {
         switchSystem();
     }
 
     @FXML
-    private void useAbilityTwo(ActionEvent event) {
+    private void useAbilityTwo() {
         attackSystem(1);
     }
 
     @FXML
-    private void useAbilityThree(ActionEvent event) {
+    private void useAbilityThree() {
         attackSystem(2);
     }
 
     @FXML
-    private void usePOne(ActionEvent event) {
+    private void usePOne() {
         potionSystem(0);
     }
 
     @FXML
-    private void usePTwo(ActionEvent event) {
+    private void usePTwo() {
         potionSystem(1);
     }
 
     @FXML
-    private void usePThree(ActionEvent event) {
+    private void usePThree() {
         potionSystem(2);
     }
 
     private void attackSystem(int index) {
         if (player.getStamina() < inventory.getEquippedWeapon().getAbility(index).getStaminaCost())
-            attackMessage.setText("You don't have enought stamina");
+            attackMessage.setText("You don't have enough stamina");
         else {
-            pAttackInfo.setText("You did an attack: -" + Integer.toString(player.attack(npc, index)));
+            pAttackInfo.setText("You did an attack: -" + player.attack(npc, index));
             transitionAttack();
         }
     }
 
     private void attackSystem() {
-        pAttackInfo.setText("You did an attack: -" + Integer.toString(player.attack(npc)));
+        pAttackInfo.setText("You did an attack: -" + player.attack(npc));
         transitionAttack();
     }
 
     private void transitionAttack() {
         upgradeStats();
         changePane(selectAttack, playerAttack);
-        boolean enemyDefeated = (npc.getHealthPoints() <= 0) ? true : false;
+        boolean enemyDefeated = npc.getHealthPoints() <= 0;
         PauseTransition enemyT = new PauseTransition(Duration.seconds(3));
         enemyT.setOnFinished(event -> {
-            if (enemyDefeated == false) {
-                nAttackInfo.setText(npc.getName() + " has made an attack and has damaged you: -"
-                        + Integer.toString(npc.attack(player)));
+            if (!enemyDefeated) {
+                nAttackInfo.setText(npc.getName() + " has made an attack and has damaged you: -" + npc.attack(player));
                 upgradeStats();
                 changePane(playerAttack, enemyAttack);
             } else {
@@ -215,7 +212,7 @@ public class BattleController {
     private void switchSystem() {
         inventory.switchEquippedWeapons();
         nAttackInfo.setText(
-                npc.getName() + " has made an attack and has damaged you: -" + Integer.toString(npc.attack(player)));
+                npc.getName() + " has made an attack and has damaged you: -" + npc.attack(player));
         upgradeStats();
         changePane(equipPWeapon, enemyAttack);
 
@@ -235,10 +232,10 @@ public class BattleController {
         String[] abilityName = new String[3];
         int[] damage = new int[3];
         int[] stamina = new int[3];
-        for (int i = 0; i < damage.length; ++i) {
+        for (int i = 0; i < 3; ++i) {
             abilityName[i] = inventory.getEquippedWeapon().getAbility(i).getName();
             damage[i] = (int) (inventory.getEquippedWeapon().getAbility(i).getBaseDamage() * player.getAttack());
-            stamina[i] = (int) (inventory.getEquippedWeapon().getAbility(i).getStaminaCost());
+            stamina[i] = inventory.getEquippedWeapon().getAbility(i).getStaminaCost();
         }
         basicAttack.setText("Basic Attack\nDamage: " + (int) (player.getAttack() * 5) + "  Stamina: 0");
         abilityOne.setText(abilityName[0] + "\nDamage: " + damage[0] + "  Stamina: " + stamina[0]);
@@ -247,9 +244,9 @@ public class BattleController {
         imgWeapon.setImage(inventory.getEquippedWeapon().render());
     }
 
-    public void renderBattleView() {
+    private void renderBattleView() {
         playerName.setText(player.getName());
-        playerLevel.setText("Level: " + Integer.toString(player.getLevel()));
+        playerLevel.setText("Level: " + player.getLevel());
         enemyName.setText(npc.getName());
         imgPlayer.setImage(player.render());
         if (npc.getParent().equals("Boss"))
@@ -301,22 +298,21 @@ public class BattleController {
     }
 
     private void upgradeStats() {
-        int PHp = (player.getHealthPoints() > 0) ? player.getHealthPoints() : 0;
-        int PSt = (player.getStamina() > 0) ? player.getStamina() : 0;
-        int EHp = (npc.getHealthPoints() > 0) ? npc.getHealthPoints() : 0;
-        playerStats.setText("HP: " + Integer.toString(PHp) + "/" + Integer.toString(player.getLimitHp()) + "  Stamina: "
-                + Integer.toString(player.getStamina()) + "/" + Integer.toString(player.getLimitStamina()));
-        enemyHealth.setText("HP: " + Integer.toString(EHp) + "/" + Integer.toString(initNpcHealth));
+        int PHp = Math.max(player.getHealthPoints(), 0);
+        int PSt = Math.max(player.getStamina(), 0);
+        int EHp = Math.max(npc.getHealthPoints(), 0);
+        playerStats.setText("HP: " + PHp + "/" + player.getLimitHp() + "  Stamina: "
+                + player.getStamina() + "/" + player.getLimitStamina());
+        enemyHealth.setText("HP: " + EHp + "/" + initNpcHealth);
         healthPBar.setProgress((double) PHp / player.getLimitHp());
         staminaBar.setProgress((double) PSt / player.getLimitStamina());
         healthEBar.setProgress((double) EHp / initNpcHealth);
     }
 
     private boolean checkPotions() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 3; ++i)
             if (inventory.getPotion(i) != null)
                 return true;
-        }
         return false;
     }
 
@@ -326,20 +322,13 @@ public class BattleController {
     }
 
     private void endGame() {
-        String classpath = System.getProperty("java.class.path");
-        File directory = new File(classpath + "/src/game/saves/" + player.getName());
-        if(deleteDirectory(directory))
-            System.out.println("GAME OVER");
+        File[] allContents = game.findFile(player.getName(), ' ').listFiles();
+        if (allContents != null)
+            for (File file : allContents)
+                file.delete();
+        if (game.findFile(player.getName(), ' ').delete())
+            System.out.println("Save deleted");
+        System.out.println("GAME OVER");
         System.exit(0);
-    }
-
-    private boolean deleteDirectory(File directoryToBeDeleted) {
-        File[] allContents = directoryToBeDeleted.listFiles();
-        if (allContents != null) {
-            for (File file : allContents) {
-                deleteDirectory(file);
-            }
-        }
-        return directoryToBeDeleted.delete();
     }
 }

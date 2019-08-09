@@ -1,10 +1,10 @@
-package src.character;
+package com.skinnylegends.character;
 
-import src.character.Character;
-import src.item.Armor;
-import src.item.armor.*;
-import src.item.Weapon;
-import src.item.weapon.*;
+import com.skinnylegends.character.Character;
+import com.skinnylegends.item.Armor;
+import com.skinnylegends.item.armor.*;
+import com.skinnylegends.item.Weapon;
+import com.skinnylegends.item.weapon.*;
 
 public abstract class NPC extends Character {
     private double baseDamage;

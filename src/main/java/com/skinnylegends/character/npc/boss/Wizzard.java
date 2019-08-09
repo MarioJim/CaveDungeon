@@ -1,6 +1,6 @@
-package src.character.npc.boss;
+package com.skinnylegends.character.npc.boss;
 
-import src.character.npc.Boss;
+import com.skinnylegends.character.npc.Boss;
 
 import javafx.scene.image.Image;
 
@@ -16,7 +16,6 @@ public class Wizzard extends Boss {
 
     @Override
     public Image render() {
-        String path = "./img/wizzard.gif";
-        return new Image(getClass().getResource(path).toString());
+        return new Image(getClass().getResource("./wizzard.gif").toString());
     }
 }

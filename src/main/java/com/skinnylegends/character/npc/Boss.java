@@ -1,7 +1,7 @@
-package src.character.npc;
+package com.skinnylegends.character.npc;
 
-import src.character.NPC;
-import src.character.Player;
+import com.skinnylegends.character.NPC;
+import com.skinnylegends.character.Player;
 
 public abstract class Boss extends NPC {
     public Boss(String name) {
@@ -10,10 +10,8 @@ public abstract class Boss extends NPC {
 
     @Override
     protected int[] getArgsForWeapon(Player player) {
-        int[] res = { 50, 10 };
-        // TO DO
-        // Make per boss, and random
-        return res;
+        // TODO: Make per boss, and random
+        return new int[]{ 50, 10 };
     }
 
     @Override
@@ -22,8 +20,8 @@ public abstract class Boss extends NPC {
     }
 
     @Override
-    public String getParent() {
-        return "Boss";
+    public ParentCharacter getParent() {
+        return ParentCharacter.BOSS;
     }
 
     @Override

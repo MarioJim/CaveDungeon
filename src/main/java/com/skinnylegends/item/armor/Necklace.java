@@ -1,6 +1,6 @@
-package src.item.armor;
+package com.skinnylegends.item.armor;
 
-import src.item.Armor;
+import com.skinnylegends.item.Armor;
 import javafx.scene.image.Image;
 
 public class Necklace extends Armor {
@@ -16,6 +16,6 @@ public class Necklace extends Armor {
 
     @Override
     public Image render() {
-        return new Image(getClass().getResource("./img/necklace" + sprite + ".png").toString());
+        return new Image(getClass().getResource("./necklace" + sprite + ".png").toString());
     }
 }

@@ -1,6 +1,6 @@
-package src.game.gui;
+package com.skinnylegends.game.gui;
 
-import src.game.Game;
+import com.skinnylegends.game.Game;
 
 import javafx.scene.Scene;
 import java.io.File;

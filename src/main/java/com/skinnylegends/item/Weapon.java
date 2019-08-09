@@ -1,7 +1,7 @@
-package src.item;
+package com.skinnylegends.item;
 
-import src.item.Item;
-import src.item.weapon.Ability;
+import com.skinnylegends.item.Item;
+import com.skinnylegends.item.weapon.Ability;
 
 public abstract class Weapon extends Item {
     private Ability[] abilities;

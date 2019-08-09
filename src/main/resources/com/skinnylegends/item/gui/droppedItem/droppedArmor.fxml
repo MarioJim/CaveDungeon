@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="768.0" prefWidth="1024.0" style="-fx-background-color: #17202A;" xmlns="http://javafx.com/javafx/8.0.202-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="src.item.gui.droppedItem.DroppedArmorController">
+<VBox prefHeight="768.0" prefWidth="1024.0" style="-fx-background-color: #17202A;" xmlns="http://javafx.com/javafx/8.0.202-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.skinnylegends.item.gui.droppedItem.DroppedArmorController">
    <children>
       <Label alignment="CENTER" prefHeight="94.0" prefWidth="1024.0" text="You got new armor!" textFill="WHITE">
          <font>
@@ -23,7 +23,7 @@
                <children>
                   <ImageView fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@/src/item/gui/droppedItem/bgItem.png" />
+                        <Image url="@/com/skinnylegends/item/gui/droppedItem/bgItem.png" />
                      </image>
                   </ImageView>
                   <ImageView fx:id="newArmorIV" fitHeight="224.0" fitWidth="224.0" pickOnBounds="true" preserveRatio="true">

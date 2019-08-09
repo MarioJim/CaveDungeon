@@ -1,11 +1,8 @@
-package src.character;
+package com.skinnylegends.character;
 
-import src.character.Character;
-import src.character.NPC;
-import src.item.Inventory;
+import com.skinnylegends.item.Inventory;
 
 public abstract class Player extends Character {
-    private static final long serialVersionUID = 1L;
     public Inventory inventory;
     private int experience;
     private int level;
@@ -32,12 +29,9 @@ public abstract class Player extends Character {
         setStamina(getLimitStamina());
     }
 
-    public Player() {
-    }
-
     @Override
-    public String getParent() {
-        return "Player";
+    public ParentCharacter getParent() {
+        return ParentCharacter.PLAYER;
     }
 
     public Inventory getInventory() {
@@ -52,7 +46,7 @@ public abstract class Player extends Character {
         return baseAttack * Math.pow(1.07, level);
     }
 
-    public double getDefense() {
+    double getDefense() {
         double playersDef = baseDefense * Math.pow(1.25, level);
         double itemsDef = 0;
         for (int i = 0; i < 3; i++)
@@ -77,11 +71,12 @@ public abstract class Player extends Character {
         return stamina;
     }
 
-    public void setStamina(int stamina) {
+    private void setStamina(int stamina) {
         this.stamina = stamina;
     }
 
     public int getLimitStamina() {
+        // TODO: Fix limitStamina function
         return baseLimitStamina * 0 + (int) (14 * Math.pow(1.08, level - 1));
     }
 
@@ -93,7 +88,7 @@ public abstract class Player extends Character {
         double damage = inventory.getEquippedWeapon().getAbility(abilityIndex).getBaseDamage() * getAttack();
         double defense = npc.getDefense();
         int totalAttack = (int) (damage * damage / (damage + defense));
-        // Update enemy healthpoints
+        // Update enemy health points
         npc.setHealthPoints(npc.getHealthPoints() - totalAttack);
         // Update player's stamina
         stamina -= inventory.getEquippedWeapon().getAbility(abilityIndex).getStaminaCost();
@@ -113,10 +108,6 @@ public abstract class Player extends Character {
         for (int i = 0; i < 2; i++)
             res += "Weapon " + i + ":\n" + inventory.getWeapon(i).printAbilities();
         return res;
-    }
-
-    public String printWeaponAbilities() {
-        return inventory.getEquippedWeapon().printAbilities();
     }
 
     public String playerToString() {

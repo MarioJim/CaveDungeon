@@ -1,4 +1,4 @@
-package src.item;
+package com.skinnylegends.item;
 
 import java.io.Serializable;
 

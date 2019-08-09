@@ -1,28 +1,23 @@
-package src.map;
+package com.skinnylegends.map;
 
-import src.map.Tile;
+import com.skinnylegends.character.Character;
+import com.skinnylegends.character.Player;
+import com.skinnylegends.character.npc.Chest;
+import com.skinnylegends.character.npc.enemy.*;
+import com.skinnylegends.character.npc.boss.*;
 
 import java.io.Serializable;
 
-import src.character.Character;
-import src.character.Player;
-import src.character.npc.Chest;
-import src.character.npc.Enemy;
-import src.character.npc.enemy.*;
-import src.character.npc.boss.*;
-
 public class Tile implements Serializable {
-    private static final long serialVersionUID = 1L;
     private int spriteNum;
     private Character character;
 
-    public Tile() {
-        super();
+    Tile() {
         int rand = (int) (Math.random() * 30) - 21;
-        spriteNum = (rand < 1) ? 1 : rand;
+        spriteNum = Math.max(rand, 1);
     }
 
-    public void addEnemy(int state) {
+    void addEnemy(int state) {
         switch (state) {
         case 2:
             character = (Math.random() < 0.5) ? new Zombie() : new Skeleton();
@@ -39,36 +34,40 @@ public class Tile implements Serializable {
         }
     }
 
-    public char hasCharacter() {
+    char hasCharacter() {
         if (character == null)
             return ' ';
         else {
-            if (character instanceof Player)
-                return 'p';
-            else if (character instanceof Chest)
-                return 'c';
-            else if (character instanceof Enemy)
-                return 'e';
-            else // character instanceof Boss
-                return 'b';
+            switch (character.getParent()) {
+                case PLAYER:
+                    return 'p';
+                case CHEST:
+                    return 'c';
+                case ENEMY:
+                    return 'e';
+                case BOSS:
+                    return 'b';
+                default:
+                    return '?';
+            }
         }
     }
 
-    public void addBoss() {
+    void addBoss() {
         int randomBoss = (int) (Math.random() * 4);
         switch (randomBoss) {
-        case 0:
-            character = new BigDemon();
-            break;
-        case 1:
-            character = new BigZombie();
-            break;
-        case 2:
-            character = new Ogre();
-            break;
-        case 3:
-            character = new Wizzard();
-            break;
+            case 0:
+                character = new BigDemon();
+                break;
+            case 1:
+                character = new BigZombie();
+                break;
+            case 2:
+                character = new Ogre();
+                break;
+            case 3:
+                character = new Wizzard();
+                break;
         }
     }
 
@@ -82,16 +81,15 @@ public class Tile implements Serializable {
         return character;
     }
 
-    public void clearCharacter() {
+    void clearCharacter() {
         character = null;
     }
 
-    public void addChest() {
+    void addChest() {
         character = new Chest();
     }
 
-    public String getSpritePath() {
-        String path = "./img/floor/" + spriteNum + ".png";
-        return getClass().getResource(path).toString();
+    String getSpritePath() {
+        return getClass().getResource("./floor/" + spriteNum + ".png").toString();
     }
 }

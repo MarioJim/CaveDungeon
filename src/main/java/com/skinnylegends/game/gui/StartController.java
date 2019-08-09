@@ -1,43 +1,37 @@
-package src.game.gui;
+package com.skinnylegends.game.gui;
+
+import com.skinnylegends.game.Game;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
-import src.game.Game;
 
 public class StartController {
     private Game game;
 
     @FXML
-    Pane wrapPane, selectPane, loadPane;
+    private Pane wrapPane, selectPane, loadPane;
     @FXML
-    TextField name;
+    private TextField name;
 
     public StartController() {
         FXMLLoader loader = new FXMLLoader();
         loader.setBuilderFactory(new JavaFXBuilderFactory());
         loader.setController(this);
         try {
-            loadPane = (Pane) loader.load(loadFXML("./loadPane.fxml"));
+            URI fxmlDocPath = getClass().getResource("./loadPane.fxml").toURI();
+            FileInputStream fxmlStream = new FileInputStream(new File(fxmlDocPath));
+            loadPane = loader.load(fxmlStream);
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public FileInputStream loadFXML(String path) throws URISyntaxException, FileNotFoundException {
-        URI fxmlDocPath = getClass().getResource(path).toURI();
-        FileInputStream fxmlStream = new FileInputStream(new File(fxmlDocPath));
-        return fxmlStream;
     }
 
     @FXML
@@ -46,40 +40,33 @@ public class StartController {
     }
 
     @FXML
-    private void newGame(ActionEvent event) {
+    private void newGame() {
         game.setCreatePlayerScene();
     }
 
     @FXML
-    private void loadGame(ActionEvent event) {
+    private void loadGame() {
         changePane(selectPane, loadPane);
     }
 
     @FXML
-    private void continueBtn(ActionEvent event) throws ClassNotFoundException, IOException {
+    private void continueBtn() throws ClassNotFoundException, IOException {
         checkAccount();
     }
 
     @FXML
-    private void backBtn(ActionEvent event) {
+    private void backBtn() {
         changePane(loadPane, selectPane);
     }
 
-    public void checkAccount() throws IOException, ClassNotFoundException {
-        if(findFile(name.getText(), 'P').exists()) {
-            game.loadPlayer(name.getText());
-            game.loadMap(name.getText());
-            game.setNewPlayerAndContinue();
+    private void checkAccount() throws IOException, ClassNotFoundException {
+        if(game.findFile(name.getText(), 'P').exists()) {
+            game.loadPlayerAndMap(name.getText());
+            game.addPlayerToMapAndContinue();
         }
         else {
             System.out.println("User doesn't exist");
         }
-    }
-
-    public File findFile(String name, char type) throws IOException {
-        String classpath = System.getProperty("java.class.path");
-        return (type == 'P') ? new File(classpath + "/src/game/saves/" + name + "/", "player.atm") : 
-                new File(classpath + "/src/game/saves/" + name + "/", "map.atm");
     }
 
     private void changePane(Pane paneRemoved, Pane paneAdded) {

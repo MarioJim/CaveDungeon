@@ -1,6 +1,6 @@
-package src.character.gui.createplayer;
+package com.skinnylegends.character.gui.createplayer;
 
-import src.game.Game;
+import com.skinnylegends.game.Game;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,7 +22,7 @@ public class CreatePlayer extends Scene {
             FileInputStream fxmlStream = new FileInputStream(new File(fxmlDocPath));
             root = (AnchorPane) loader.load(fxmlStream);
         } catch (Exception e) {
-            System.out.println("ERROR: Create PLayer couldn't be started");
+            e.printStackTrace();
         }
         CreatePlayerController playerController = loader.<CreatePlayerController>getController();
         playerController.setGame(game);

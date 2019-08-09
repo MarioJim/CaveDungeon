@@ -1,7 +1,7 @@
-package src.character.npc.enemy;
+package com.skinnylegends.character.npc.enemy;
 
-import src.character.npc.Enemy;
-import src.character.Player;
+import com.skinnylegends.character.npc.Enemy;
+import com.skinnylegends.character.Player;
 
 import java.util.concurrent.ThreadLocalRandom;
 import javafx.scene.image.Image;
@@ -20,8 +20,7 @@ public class Chort extends Enemy {
     protected int[] getArgsForWeapon(Player player) {
         int baseAttack = ThreadLocalRandom.current().nextInt(20, 26);
         int baseStamina = ThreadLocalRandom.current().nextInt(6, 10);
-        int[] res = { baseAttack, baseStamina };
-        return res;
+        return new int[]{ baseAttack, baseStamina };
     }
 
     @Override
@@ -36,7 +35,6 @@ public class Chort extends Enemy {
 
     @Override
     public Image render() {
-        String path = "./img/chort.gif";
-        return new Image(getClass().getResource(path).toString());
+        return new Image(getClass().getResource("./chort.gif").toString());
     }
 }

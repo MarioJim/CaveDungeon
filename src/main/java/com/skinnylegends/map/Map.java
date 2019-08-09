@@ -1,23 +1,23 @@
-package src.map;
+package com.skinnylegends.map;
 
-import src.character.Player;
+import com.skinnylegends.character.Player;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class Map implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private static Random random = new Random();
-    private Room rooms[][];
+    private Random random;
+    private Room[][] rooms;
     private int minNumRooms, sizeX, sizeY;
     public int startX, startY;
     // 0 to be defined, 1 initial, 2 easy, 3 hard, 4 treasure, 5 boss
     private final int[] probabilities = { 0, 0, 45, 90, 100, 100 };
-    private final int doorChance = 30;
+    private final int doorChance = 40;
 
     public Map(long seed) {
-        random.setSeed(seed);
+        random = new Random(seed);
         minNumRooms = 9;
         sizeX = 7;
         sizeY = 9;
@@ -30,10 +30,6 @@ public class Map implements Serializable {
                     r.generateRoom();
     }
 
-    public Map() {
-        
-    }
-
     private void generateMap() {
         // Declare a counter of rooms created
         int roomCount;
@@ -42,8 +38,8 @@ public class Map implements Serializable {
         do {
             // Declare array of rooms
             rooms = new Room[sizeX][sizeY];
-            // Declare an arraylist to store coordinates of rooms to create
-            ArrayList<int[]> roomsToCreate = new ArrayList<int[]>();
+            // Declare an ArrayList to store coordinates of rooms to create
+            ArrayList<int[]> roomsToCreate = new ArrayList<>();
             // Set center room as initial positions
             startX = (int) Math.floor((sizeX - 1) / 2.0);
             startY = (int) Math.floor((sizeY - 1) / 2.0);
@@ -74,49 +70,38 @@ public class Map implements Serializable {
         // Protect room array against overwrites
         if (rooms[x][y] != null) {
             // Only overwrite if it already has a state
-            if (state != 0)
-                rooms[x][y].setState(state);
-            else
-                return;
+            if (state != 0) rooms[x][y].setState(state);
+            else return;
         }
         // 0 top, 1 right, 2 bottom, 3 left
         boolean[] doors = new boolean[4];
         // Generate random door arrangement
         for (int i = 0; i < 4; i++)
-            doors[i] = getRandomRange(1, 100) <= doorChance;
+            doors[i] = getRandomPercentage() <= doorChance;
         // Check if it is next to walls (but leave the entire border with null rooms)
-        doors[0] = (x == 1) ? false : doors[3];
-        doors[2] = (x == sizeX - 2) ? false : doors[1];
-        doors[3] = (y == 1) ? false : doors[0];
-        doors[1] = (y == sizeY - 2) ? false : doors[2];
+        doors[0] &= x != 1;
+        doors[2] &= x != sizeX - 2;
+        doors[3] &= y != 1;
+        doors[1] &= y != sizeY - 2;
         // Check if there are doors from neighboring rooms to this one
         // If there are, add them to this one, else don't
-        if (rooms[x - 1][y] != null)
-            doors[0] = rooms[x - 1][y].getDoor(2);
-        if (rooms[x][y + 1] != null)
-            doors[1] = rooms[x][y + 1].getDoor(3);
-        if (rooms[x + 1][y] != null)
-            doors[2] = rooms[x + 1][y].getDoor(0);
-        if (rooms[x][y - 1] != null)
-            doors[3] = rooms[x][y - 1].getDoor(1);
+        if (rooms[x - 1][y] != null) doors[0] = rooms[x - 1][y].getDoor(2);
+        if (rooms[x][y + 1] != null) doors[1] = rooms[x][y + 1].getDoor(3);
+        if (rooms[x + 1][y] != null) doors[2] = rooms[x + 1][y].getDoor(0);
+        if (rooms[x][y - 1] != null) doors[3] = rooms[x][y - 1].getDoor(1);
         // If there isn't a room in a direction, and there is a door
         // from this room to that direction, add a room there
-        if (rooms[x - 1][y] == null && doors[0])
-            roomsToCreate.add(new int[] { x - 1, y });
-        if (rooms[x][y + 1] == null && doors[1])
-            roomsToCreate.add(new int[] { x, y + 1 });
-        if (rooms[x + 1][y] == null && doors[2])
-            roomsToCreate.add(new int[] { x + 1, y });
-        if (rooms[x][y - 1] == null && doors[3])
-            roomsToCreate.add(new int[] { x, y - 1 });
+        if (rooms[x - 1][y] == null && doors[0]) roomsToCreate.add(new int[] { x - 1, y });
+        if (rooms[x][y + 1] == null && doors[1]) roomsToCreate.add(new int[] { x, y + 1 });
+        if (rooms[x + 1][y] == null && doors[2]) roomsToCreate.add(new int[] { x + 1, y });
+        if (rooms[x][y - 1] == null && doors[3]) roomsToCreate.add(new int[] { x, y - 1 });
         // Create a room, set type and doors, and add the new room to map
         state = (state == 0) ? getRandomType() : state;
         // If it is adjacent to the initial room, and its state is 3, make it 2
-        if ((y == startY && (x == startX + 1 || x == startX - 1))
-                || (x == startX && (y == startY - 1 || y == startY + 1)))
+        if ((y == startY && (x == startX + 1 || x == startX - 1)) ||
+                (x == startX && (y == startY - 1 || y == startY + 1)))
             state = (state == 3) ? 2 : state;
-        Room r = new Room(state, doors);
-        rooms[x][y] = r;
+        rooms[x][y] = new Room(state, doors);
     }
 
     private void deleteUnconnectedRooms() throws BossRoomDeletedException {
@@ -136,30 +121,26 @@ public class Map implements Serializable {
             for (int y = 1; y < sizeY - 1; y++)
                 if (rooms[x][y] != null) {
                     if (rooms[x - 1][y] == null)
-                        rooms[x][y].setDoor(0, false);
+                        rooms[x][y].closeDoor(0);
                     if (rooms[x][y + 1] == null)
-                        rooms[x][y].setDoor(1, false);
+                        rooms[x][y].closeDoor(1);
                     if (rooms[x + 1][y] == null)
-                        rooms[x][y].setDoor(2, false);
+                        rooms[x][y].closeDoor(2);
                     if (rooms[x][y - 1] == null)
-                        rooms[x][y].setDoor(3, false);
+                        rooms[x][y].closeDoor(3);
                 }
     }
 
     private int getRandomType() {
-        int rNum = getRandomRange(1, 100);
+        int rNum = getRandomPercentage();
         for (int i = 0; i < probabilities.length; i++)
             if (rNum < probabilities[i])
                 return i;
         return 2;
     }
 
-    private static int getRandomRange(int min, int max) {
-        return random.nextInt(++max - min) + min;
-    }
-
-    public Room[][] getRooms() {
-        return rooms;
+    private int getRandomPercentage() {
+        return random.nextInt(101);
     }
 
     public Room getRoom(int x, int y) {
@@ -171,7 +152,7 @@ public class Map implements Serializable {
     }
 
     public String mapToString() {
-        String res = "", whitespace = "";
+        StringBuilder res = new StringBuilder();
         String[] roomSplit, row;
         // Find rooms to be trimmed from the left
         int minRooms = sizeY;
@@ -183,14 +164,12 @@ public class Map implements Serializable {
                 minRooms = currentRooms;
         }
         // Generate a placeholder for null rooms
-        for (int i = 0; i <= Room.sizeY + 2; i++)
-            whitespace += " ";
+        StringBuilder whitespace = new StringBuilder().append(" ".repeat(Room.sizeY + 3));
         int leadingWhitespace = --minRooms * whitespace.length();
         // Generate the string
         for (int x = 1; x < sizeX - 1; x++) {
             row = new String[Room.sizeX + 2];
-            for (int i = 0; i < row.length; i++)
-                row[i] = "";
+            Arrays.fill(row, "");
             for (int y = 1; y < sizeY - 1; y++) {
                 if (rooms[x][y] != null) {
                     roomSplit = rooms[x][y].roomToString().split("\n");
@@ -200,13 +179,13 @@ public class Map implements Serializable {
                         row[i] += roomSplit[i] + " ";
                 } else
                     for (int i = 0; i < row.length; i++)
-                        row[i] += whitespace;
+                        row[i] += whitespace.toString();
             }
             // Remove leading and trailing whitespace
-            for (int i = 0; i < row.length; i++)
-                res += row[i].substring(leadingWhitespace).replaceFirst("\\s++$", "") + "\n";
+            for (String s : row)
+                res.append(s.substring(leadingWhitespace).replaceFirst("\\s++$", "")).append("\n");
         }
         // Remove empty lines
-        return res.replaceAll("\n\\s*\n", "\n");
+        return res.toString().replaceAll("\n\\s*\n", "\n");
     }
 }

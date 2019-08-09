@@ -1,8 +1,8 @@
-package src.item.gui.droppedItem;
+package com.skinnylegends.item.gui.droppedItem;
 
-import src.game.Game;
-import src.item.Inventory;
-import src.item.Weapon;
+import com.skinnylegends.game.Game;
+import com.skinnylegends.item.Inventory;
+import com.skinnylegends.item.Weapon;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
