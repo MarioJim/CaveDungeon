@@ -7,7 +7,7 @@ public abstract class Character implements Serializable {
     private String name;
     private int healthPoints;
 
-    public Character(String name, int healthPoints) {
+    Character(String name, int healthPoints) {
         this.name = name;
         this.healthPoints = healthPoints;
     }
@@ -24,14 +24,27 @@ public abstract class Character implements Serializable {
         return healthPoints;
     }
 
-    public void setHealthPoints(int healthPoints) {
+    void setHealthPoints(int healthPoints) {
         this.healthPoints = healthPoints;
     }
 
     public abstract String getType();
 
     public enum ParentCharacter {
-        BOSS, CHEST, ENEMY, PLAYER
+        BOSS('b'),
+        CHEST('c'),
+        ENEMY('e'),
+        PLAYER('p');
+
+        private char characterInMap;
+
+        ParentCharacter(char characterInMap) {
+            this.characterInMap = characterInMap;
+        }
+
+        public char getCharacterInMap() {
+            return characterInMap;
+        }
     }
 
     public abstract ParentCharacter getParent();

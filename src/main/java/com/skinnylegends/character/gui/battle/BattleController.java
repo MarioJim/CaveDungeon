@@ -1,5 +1,6 @@
 package com.skinnylegends.character.gui.battle;
 
+import com.skinnylegends.character.Character;
 import com.skinnylegends.character.Player;
 import com.skinnylegends.character.npc.Boss;
 import com.skinnylegends.character.NPC;
@@ -249,7 +250,7 @@ public class BattleController {
         playerLevel.setText("Level: " + player.getLevel());
         enemyName.setText(npc.getName());
         imgPlayer.setImage(player.render());
-        if (npc.getParent().equals("Boss"))
+        if (npc.getParent() == Character.ParentCharacter.BOSS)
             imgNpc.setFitWidth(256);
         imgNpc.setImage(npc.render());
         upgradeStats();

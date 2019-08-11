@@ -12,49 +12,25 @@ public class Tile implements Serializable {
     private int spriteNum;
     private Character character;
 
-    Tile() {
-        int rand = (int) (Math.random() * 30) - 21;
-        spriteNum = Math.max(rand, 1);
+    Tile(int rand) {
+        spriteNum = Math.max(rand - 21, 1);
     }
 
-    void addEnemy(int state) {
-        switch (state) {
-        case 2:
-            character = (Math.random() < 0.5) ? new Zombie() : new Skeleton();
-            break;
-        case 3:
-            int randomEnemy = (int) (Math.random() * 8);
-            if (randomEnemy < 4)
-                character = new Chort();
-            else if (randomEnemy < 7)
-                character = new Swampy();
-            else
-                character = new Necromancer();
-            break;
+    void addEnemy(Room.Type type, int randomNum) {
+        if (type == Room.Type.EASY) {
+            character = randomNum < 4 ? new Zombie() : new Skeleton();
+        } else {
+            if (randomNum < 4) character = new Chort();
+            else if (randomNum < 7) character = new Swampy();
+            else character = new Necromancer();
         }
     }
 
     char hasCharacter() {
-        if (character == null)
-            return ' ';
-        else {
-            switch (character.getParent()) {
-                case PLAYER:
-                    return 'p';
-                case CHEST:
-                    return 'c';
-                case ENEMY:
-                    return 'e';
-                case BOSS:
-                    return 'b';
-                default:
-                    return '?';
-            }
-        }
+        return (character == null) ? ' ' : character.getParent().getCharacterInMap();
     }
 
-    void addBoss() {
-        int randomBoss = (int) (Math.random() * 4);
+    void addBoss(int randomBoss) {
         switch (randomBoss) {
             case 0:
                 character = new BigDemon();
@@ -66,7 +42,7 @@ public class Tile implements Serializable {
                 character = new Ogre();
                 break;
             case 3:
-                character = new Wizzard();
+                character = new Wizard();
                 break;
         }
     }

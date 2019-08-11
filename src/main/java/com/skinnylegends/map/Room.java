@@ -1,5 +1,6 @@
 package com.skinnylegends.map;
 
+import com.skinnylegends.character.Character;
 import com.skinnylegends.character.NPC;
 import com.skinnylegends.character.Player;
 import com.skinnylegends.character.npc.enemy.MimicChest;
@@ -7,6 +8,8 @@ import com.skinnylegends.map.gui.MapRender;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Random;
+
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
@@ -16,8 +19,10 @@ import javafx.geometry.VPos;
 import javafx.scene.image.ImageView;
 
 public class Room implements Serializable {
-    // 0 to be defined, 1 initial, 2 easy, 3 hard, 4 treasure, 5 boss
-    private int state;
+    public enum Type {
+        INITIAL, EASY, HARD, TREASURE, BOSS
+    }
+    private Type type;
     // 0 top, 1 right, 2 bottom, 3 left
     private boolean[] doors;
     private boolean areDoorsOpen;
@@ -27,31 +32,19 @@ public class Room implements Serializable {
     public static final int centerX = (int) Math.floor((sizeX - 1) / 2.0);
     public static final int centerY = (int) Math.floor((sizeY - 1) / 2.0);
 
-    Room(int state, boolean[] doors) {
-        this.state = state;
+    Room(Type type, boolean[] doors) {
+        this.type = type;
         this.doors = doors;
         this.areDoorsOpen = false;
         tiles = new Tile[sizeX][sizeY];
     }
 
-    void setState(int state) {
-        this.state = state;
-    }
-
-    int getState() {
-        return state;
-    }
-
-    void closeDoor(int place) {
-        doors[place] = false;
+    Type getType() {
+        return type;
     }
 
     boolean getDoor(int place) {
         return doors[place];
-    }
-
-    boolean isNotConnected() {
-        return !doors[0] && !doors[1] && !doors[2] && !doors[3];
     }
 
     public void checkIfDoorsShouldOpen() {
@@ -66,40 +59,39 @@ public class Room implements Serializable {
         this.areDoorsOpen = true;
     }
 
-    void generateRoom() {
+    void generateRoom(Random random) {
         for (int x = 0; x < sizeX; x++)
             for (int y = 0; y < sizeY; y++)
-                tiles[x][y] = new Tile();
-        switch (state) {
-        case 2:
-        case 3:
-            spawnEnemies();
-            break;
-        case 4:
-            tiles[centerX][centerY].addChest();
-            break;
-        case 5:
-            tiles[centerX][centerY].addBoss();
-            break;
+                tiles[x][y] = new Tile(random.nextInt(30));
+        switch (type) {
+            case EASY:
+            case HARD:
+                spawnEnemies(random);
+                break;
+            case TREASURE:
+                tiles[centerX][centerY].addChest();
+                break;
+            case BOSS:
+                tiles[centerX][centerY].addBoss(random.nextInt(4));
         }
     }
 
-    private void spawnEnemies() {
+    private void spawnEnemies(Random random) {
         ArrayList<int[]> possibleTiles = new ArrayList<>();
         for (int x = 0; x < sizeX; x++)
             for (int y = 0; y < sizeY; y++)
                 if (x != centerX && y != centerY)
                     possibleTiles.add(new int[] { x, y });
-        int numEnemies = 2 + (int) (Math.random() * 3);
+        int numEnemies = 2 + random.nextInt(3);
         // Choose numEnemies random tiles from possibleTiles
         ArrayList<int[]> chosenTiles = new ArrayList<>();
         for (int i = 0; i < numEnemies; i++) {
-            int index = (int) (Math.random() * possibleTiles.size());
+            int index = random.nextInt(possibleTiles.size());
             chosenTiles.add(possibleTiles.get(index));
         }
         // Add enemies for every chosen tile
         for (int i = 0; i < numEnemies; i++)
-            tiles[chosenTiles.get(i)[0]][chosenTiles.get(i)[1]].addEnemy(state);
+            tiles[chosenTiles.get(i)[0]][chosenTiles.get(i)[1]].addEnemy(type, random.nextInt(8));
     }
 
     public void setPlayer(Player player, int x, int y)
@@ -151,7 +143,7 @@ public class Room implements Serializable {
             }
         } catch (TileAlreadyOccupiedException e) {
             NPC npc = (NPC) tiles[playerPos[0] + x][playerPos[1] + y].getCharacter();
-            if (npc.getType().equals("Chest")) {
+            if (npc.getParent() == Character.ParentCharacter.CHEST) {
                 if (Math.random() < 0.25)
                     mapRender.getGame().startBattle(new MimicChest());
                 else if (Math.random() > 0.5)
@@ -226,5 +218,12 @@ public class Room implements Serializable {
             }
         }
         return new StackPane(floor, characters);
+    }
+
+    static Type getRandomType(Random random) {
+        int rNum = random.nextInt(100);
+        if (rNum < 45) return Type.EASY;
+        else if (rNum < 90) return Type.HARD;
+        else return Type.TREASURE;
     }
 }

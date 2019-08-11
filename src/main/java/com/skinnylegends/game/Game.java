@@ -55,11 +55,6 @@ public class Game extends Application {
         stage.show();
     }
 
-    private void mapTests() {
-        for (Map level : levels)
-            System.out.println(level.mapToString());
-    }
-
     private void playerTests() {
         System.out.println(player.playerToString());
         System.out.println("Your equipped weapon is: " + player.getInventory().getEquippedWeapon().getName());
@@ -85,7 +80,9 @@ public class Game extends Application {
     //This method runs only when an user is loaded
     public void addPlayerToMapAndContinue() {
         levels[0].setPlayer(player);
-        mapTests();
+        // TODO: Stop printing map
+        for (Map level : levels)
+            System.out.println(level.mapToString());
         mapRender = new MapRender(this, levels[0]);
         playerTests();
         setRoomScene();

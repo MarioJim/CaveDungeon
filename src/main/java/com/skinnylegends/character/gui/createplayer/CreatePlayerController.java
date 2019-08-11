@@ -43,7 +43,7 @@ public class CreatePlayerController {
     }
 
     private char genderSelected() {
-        return gender.getValue().equals("Male") ? 'm' : 'f';
+        return gender.getValue().toLowerCase().charAt(0);
     }
 
     public void setGame(Game game) {
